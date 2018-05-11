@@ -1,0 +1,50 @@
+{
+  "builders":
+  [
+    {
+      "name": "windows-enterprise-eval",
+      "type": "qemu",
+      "iso_checksum_type": "sha256",
+      "iso_checksum": "1ce702a578a3cb1ac3d14873980838590f06d5b7101c5daaccbac9d73f1fb50f",
+      "iso_urls": [ "http://care.dlservice.microsoft.com/dl/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO" ],
+      "communicator": "winrm",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "12h",
+      "winrm_use_ssl": "true",
+      "winrm_insecure": "true",
+
+      "disk_interface": "ide",
+      "net_device": "e1000",
+
+      "qemuargs": [
+        [ "-display", "gtk" ],
+        [ "-m", "4G" ],
+        [ "-smp", "2" ],
+        [ "-netdev", "user,hostfwd=tcp::{{ .SSHHostPort }}-:5986,id=forward,ipv4" ],
+        [ "-device", "e1000,netdev=forward,id=net0"]
+      ],
+
+      "disk_size": "51200",
+
+      "floppy_files": [
+        "fixnetwork.ps1",
+        "Autounattend.xml"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell-local",
+      "command": "ansible-playbook -vv --connection=winrm --extra-vars='ansible_winrm_server_cert_validation=ignore ansible_user=vagrant ansible_ssh_pass=vagrant ansible_port={{ .SSHHostPort }}' -i 127.0.0.1, win.yml"
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "vagrant",
+        "output": "windows-enterprise-eval-{{ .Provider }}.box"
+      }
+    ]
+  ]
+}
