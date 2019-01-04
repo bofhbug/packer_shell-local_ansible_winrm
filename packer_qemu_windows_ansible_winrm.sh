@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-PACKER_VERSION="1.2.3"
+PACKER_VERSION="1.3.3"
 
 sudo dnf install -y ansible qemu-img qemu-kvm unzip wget
 
